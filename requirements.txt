@@ -1,0 +1,21 @@
+#API
+fastapi
+uvicorn
+
+#APP
+streamlit
+
+#.env
+python-dotenv
+
+# visuals
+seaborn
+plotly
+matplotlib
+
+#basics
+numpy
+pandas
+
+# notebook
+nbdime
