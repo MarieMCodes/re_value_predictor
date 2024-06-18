@@ -13,9 +13,10 @@ seaborn
 plotly
 matplotlib
 
-#basics
+#analysis
 numpy
 pandas
+datetime
 
 # notebook
 nbdime
