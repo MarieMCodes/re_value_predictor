@@ -6,7 +6,7 @@ uvicorn
 streamlit
 
 #.env
-python-dotenv
+#python-dotenv
 
 # visuals
 seaborn
