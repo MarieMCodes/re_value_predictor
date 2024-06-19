@@ -10,7 +10,8 @@ def root():
 
 @app.get('/predict')
 def predict(free_text_address):
-    pass
+    free_text_address = free_text_address.upper()
+    return {'prediction': free_text_address}
     # with open ('../models/best_model.pkl', 'rb') as model_file:
     #     model = pickle.load(model_file)
     # codified_address = placeholder_function_to_codify_text(free_text_address)

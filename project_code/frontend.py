@@ -5,17 +5,19 @@ import requests
 st.title('London Real Estate Value Predictor')
 
 # get our free text address input
-free_text_address = st.text_input(label='Enter your London address here', value='')
+text = st.text_input(label='Enter your London address here', value='')
 
 # Method 1 - local
-url = 'http://127.0.0.1:8000/'
+url = 'http://127.0.0.1:8000/predict'
 
 # Method 2 - on streamlit
-# url = 'https://basic-api-32vj2qxrpq-ew.a.run.app' #here goes the google run container instance API URL
+# url = 'https://basic-api-32vj2qxrpq-ew.a.run.app/predict' #here goes the google run container instance API URL
 
-
-response = requests.get(url=url).json()
-
-
-
-st.write('The answer is', str(response))
+params = {
+    'free_text_address': str(text)
+}
+if text:
+    response = requests.get(url=url, params=params).json()['prediction']
+    st.write(response)
+else:
+    st.write('Awaiting input...')
