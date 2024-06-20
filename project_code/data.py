@@ -15,8 +15,8 @@ def load_sample_data(df: pd.DataFrame, n_samples: int = 5000, random_state: int 
                dtype={'price': np.int32,'day':np.int16, 'month':np.int16,'year':np.int16}
                   ).sample(n=n_samples, random_state=random_state)
     return df_sampled
-  
-  
+
+
 
 def load_csv():
     ''' loads london csv file from raw_data folder '''
@@ -28,14 +28,17 @@ def load_csv():
     return df
 
 
-  
+
 # columns of tidy_df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ground',
 #       'street', 'borough', 'year', 'month', 'day', 'full_property_number']
 
-def tidy_df(df):
-    ''' takes london re data df and deletes locality, town, county columns,
+def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    takes london re df and deletes locality, town, county columns,
     merges number and additional info to create new column and deleting the former individual ones,
-    and renames district column to borough.'''
+    and renames district column to borough.
+    '''
+
     # replace nan values w empty strings
     df.fillna({'additional_info':''}, inplace=True)
 
@@ -46,5 +49,32 @@ def tidy_df(df):
     df.drop(columns=['number', 'additional_info', 'locality','town','county'], inplace=True)
 
     df.rename(columns={'district':'borough'}, inplace=True)
+
+      # dropping rows where 'type'=='O'
+    df=df[df['property_type']!='O']
+
+    # dropping rows where 'ground' == 'U'
+    df=df[df['ground']!='U']
+
+    return df
+
+
+
+def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    taking dataframe and adding new columns:
+    - 2 and 3 chars shortened postcodes,
+    - sin cos for months
+    returns df
+    '''
+
+    # add shortened postcodes
+    df['short2_pc']=df[['postcode']].apply(lambda x: x.str[:2])
+    df['short3_pc']=df[['postcode']].apply(lambda x: x.str[:3])
+
+    # dropping postcode
+    df.drop(columns='postcode', inplace=True)
+
+    # add sin cos feature engineering
 
     return df
