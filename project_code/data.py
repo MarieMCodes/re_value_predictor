@@ -1,10 +1,22 @@
 import pandas as pd
 import numpy as np
 
-# columns of loaded df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ground',
+# columns = ['price', 'date', 'postcode', 'property_type', 'property_age', 'ground',
 #       'number', 'additional_info', 'street', 'locality', 'town', 'district',
-#       'county', 'year', 'month', 'day'],
-#
+#       'county', 'year', 'month', 'day']
+
+def load_sample_data(df: pd.DataFrame, n_samples: int = 5000, random_state: int = 1) -> pd.DataFrame:
+    """
+    Load a sample of the dataset.
+    """
+    file='../raw_data/london_real_estate_data.zip'
+    df_sampled=pd.read_csv(file,
+               compression='zip',
+               dtype={'price': np.int32,'day':np.int16, 'month':np.int16,'year':np.int16}
+                  ).sample(n=n_samples, random_state=random_state)
+    return df_sampled
+  
+  
 
 def load_csv():
     ''' loads london csv file from raw_data folder '''
@@ -16,10 +28,9 @@ def load_csv():
     return df
 
 
-
-# columns of tidy df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ground',
+  
+# columns of tidy_df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ground',
 #       'street', 'borough', 'year', 'month', 'day', 'full_property_number']
-#
 
 def tidy_df(df):
     ''' takes london re data df and deletes locality, town, county columns,
