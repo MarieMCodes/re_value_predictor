@@ -68,9 +68,9 @@ def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
     returns df
     '''
 
-    # add shortened postcodes
+    # add shortened postcodes - choose of the the below
     df['short2_pc']=df[['postcode']].apply(lambda x: x.str[:2])
-    df['short3_pc']=df[['postcode']].apply(lambda x: x.str[:3])
+    #df['short3_pc']=df[['postcode']].apply(lambda x: x.str[:3])
 
     # dropping postcode
     df.drop(columns='postcode', inplace=True)
