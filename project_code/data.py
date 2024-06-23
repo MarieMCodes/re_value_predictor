@@ -15,8 +15,8 @@ def load_sample_data(df: pd.DataFrame, n_samples: int = 5000, random_state: int 
                dtype={'price': np.int32,'day':np.int16, 'month':np.int16,'year':np.int16}
                   ).sample(n=n_samples, random_state=random_state)
     return df_sampled
-  
-  
+
+
 
 def load_csv():
     ''' loads london csv file from raw_data folder '''
@@ -28,23 +28,61 @@ def load_csv():
     return df
 
 
-  
-# columns of tidy_df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ground',
-#       'street', 'borough', 'year', 'month', 'day', 'full_property_number']
 
-def tidy_df(df):
-    ''' takes london re data df and deletes locality, town, county columns,
-    merges number and additional info to create new column and deleting the former individual ones,
-    and renames district column to borough.'''
+# columns of tidy_df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ownership',
+#     'year', 'month']
+
+def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    takes london re df and deletes all columns not needed as features for model,
+    renames various columns,
+    removes nan values,
+    removes price outliers.
+    '''
+
     # replace nan values w empty strings
     df.fillna({'additional_info':''}, inplace=True)
 
     # merging number and additional number
     df['full_property_number']=df['number']+ '' + df['additional_info']
 
-    # dropping columns
-    df.drop(columns=['number', 'additional_info', 'locality','town','county'], inplace=True)
+    df.rename(columns={'district':'borough', 'ground':'ownership'}, inplace=True)
 
-    df.rename(columns={'district':'borough'}, inplace=True)
+    # dropping columns
+    df.drop(columns=['day', 'number', 'street', 'additional_info',\
+        'full_property_number', 'borough', 'locality','town','county'], inplace=True)
+
+    # drop rows with NaN (3000 in postcode)
+    df.dropna(axis=0, how='any', inplace=True)
+
+    # dropping rows where 'type'=='O'
+    df=df[df['property_type']!='O']
+
+    # dropping rows where 'ownership' == 'U'
+    df=df[df['ownership']!='U']
+
+    #remove price outliers
+    df=df[df['price']>199_999]
+    df=df[df['price']<15_000_000]
+
+    return df
+
+
+# NOT NEEDED FOR NOW as we are working with the full postcode!!
+def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    taking dataframe and adding new columns:
+    - 2 and 3 chars shortened postcodes,
+    - sin cos for months
+    returns df
+    '''
+    # add shortened postcodes - choose one of the the below
+    df['short2_pc']=df[['postcode']].apply(lambda x: x.str[:2])
+    #df['short3_pc']=df[['postcode']].apply(lambda x: x.str[:3])
+
+    # dropping postcode
+    # df.drop(columns='postcode', inplace=True)
+
+    # add sin cos feature engineering
 
     return df
