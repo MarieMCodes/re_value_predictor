@@ -37,13 +37,12 @@ def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
     takes london re df and deletes all columns not needed as features for model,
     renames district and borough columns,
     removes nan values,
-    removes price outliers.
     '''
     # replace nan values w empty strings
     df.fillna({'additional_info':''}, inplace=True)
 
     # merging number and additional number
-    df['full_property_number']=df['number']+ '' + df['additional_info']
+    df['full_property_number']=df['number']+ ' ' + df['additional_info']
 
     df.rename(columns={'district':'borough', 'ground':'ownership'}, inplace=True)
 
@@ -53,15 +52,13 @@ def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
     # dropping rows where 'ownership' == 'U'
     df=df[df['ownership']!='U']
 
-    #remove price outliers
-    df=df[df['price']>199_999]
-    df=df[df['price']<15_000_000]
-
     return df
+
 
 def shorten_df(df):
     """
-    removes unneccessary columns and postcode nan values
+    removes unneccessary columns and postcode nan values,
+    remove price outliers
     """
     # dropping columns
     df.drop(columns=['day', 'number', 'street', 'additional_info',\
@@ -69,6 +66,10 @@ def shorten_df(df):
 
     # drop rows with NaN (3000 in postcode)
     df.dropna(axis=0, how='any', inplace=True)
+
+    #remove price outliers
+    df=df[df['price']>199_999]
+    df=df[df['price']<15_000_000]
 
     return df
 
