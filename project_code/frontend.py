@@ -53,7 +53,7 @@ def main(env='local'):
         if st.button("Model Prediction") and input_complete:
             # st.write(f'{url}/{params}')
             response = requests.get(url=url, params=params).json()
-            st.write('The answer is', str(response))
+            st.write('The answer is', str(response['prediction:']))
     except UnboundLocalError:
         st.write('No input or input incomplete.')
 

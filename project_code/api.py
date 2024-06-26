@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 import pickle
 
-import os
 import pandas as pd
-from keras.models import Sequential, Model
+import tensorflow as tf
+from tensorflow import keras
 
-
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn.model_selection import KFold
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler,RobustScaler, OneHotEncoder
+# from sklearn.metrics import mean_absolute_error, mean_squared_error
+# from sklearn.model_selection import KFold
 
 app = FastAPI()
 
@@ -28,7 +30,7 @@ def predict(user_year, user_month, user_postcode, user_property_type, user_prope
     }
     # print(userinput)
     # print(os.path.exists('../models/best_model.pkl'))
-    with open ('../models/best_model.pkl', 'rb') as model_file:
+    with open('../models/best_model.keras', 'rb') as model_file:
         preprocessor, model = pickle.load(model_file)
         df_userinput = pd.DataFrame(userinput)
         transformed_userinput = preprocessor.transform(df_userinput)
@@ -46,4 +48,5 @@ def predict(user_year, user_month, user_postcode, user_property_type, user_prope
 # }
 
 if __name__ == '__main__':
-    predict(user_year=1998, user_month=5, user_postcode='N1 2JU', user_property_type='F', user_property_age='O', user_ground='L')
+    prediction = predict(user_year=1998, user_month=5, user_postcode='N1 2JU', user_property_type='F', user_property_age='O', user_ground='L')
+    print(f'The prediction for the default values is: {prediction}')
