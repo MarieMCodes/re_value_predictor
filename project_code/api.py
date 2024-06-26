@@ -30,10 +30,13 @@ def predict(user_year, user_month, user_postcode, user_property_type, user_prope
     }
     # print(userinput)
     # print(os.path.exists('../models/best_model.pkl'))
-    with open('../models/best_model.keras', 'rb') as model_file:
-        preprocessor, model = pickle.load(model_file)
+    with open('../models/processor.pkl', 'rb') as processor_file:
+        # preprocess
+        preprocessor = pickle.load(processor_file)
         df_userinput = pd.DataFrame(userinput)
         transformed_userinput = preprocessor.transform(df_userinput)
+        # load model and predict
+        model = keras.models.load_model('../models/model.keras')
         prediction_log_return = model.predict(transformed_userinput).flatten()[0]
         return {'prediction':prediction_log_return}
 
