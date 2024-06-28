@@ -1,6 +1,16 @@
 from fastapi import FastAPI
 import pickle
 
+import pandas as pd
+import tensorflow as tf
+from tensorflow import keras
+
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler,RobustScaler, OneHotEncoder
+# from sklearn.metrics import mean_absolute_error, mean_squared_error
+# from sklearn.model_selection import KFold
+
 app = FastAPI()
 
 @app.get('/')
@@ -9,10 +19,37 @@ def root():
 
 
 @app.get('/predict')
-def predict(free_text_address):
-    pass
-    # with open ('../models/best_model.pkl', 'rb') as model_file:
-    #     model = pickle.load(model_file)
-    # codified_address = placeholder_function_to_codify_text(free_text_address)
-    # prediction = model.predict(codified_text) #this means we expect
-    # return prediction
+def predict(user_year, user_month, user_postcode, user_property_type, user_property_age, user_ground):
+    userinput = {
+        'user_year': user_year,
+        'user_month': user_month,
+        'user_postcode': user_postcode,
+        'user_property_type': user_property_type,
+        'user_property_age': user_property_age,
+        'user_groun': user_ground
+    }
+    # print(userinput)
+    # print(os.path.exists('../models/best_model.pkl'))
+    with open('../models/processor.pkl', 'rb') as processor_file:
+        # preprocess
+        preprocessor = pickle.load(processor_file)
+        df_userinput = pd.DataFrame(userinput)
+        transformed_userinput = preprocessor.transform(df_userinput)
+        # load model and predict
+        model = keras.models.load_model('../models/model.keras')
+        prediction_log_return = model.predict(transformed_userinput).flatten()[0]
+        return {'prediction':prediction_log_return}
+
+# sample_data = {
+#     'year': [2022],
+#     'month': [6],
+#     'day': [21],
+#     'postcode': [N1 2JU],
+#     'property_type': ['F'],
+#     'property_age': ['N'],
+#     'ground': ['F']
+# }
+
+if __name__ == '__main__':
+    prediction = predict(user_year=1998, user_month=5, user_postcode='N1 2JU', user_property_type='F', user_property_age='O', user_ground='L')
+    print(f'The prediction for the default values is: {prediction}')

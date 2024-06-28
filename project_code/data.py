@@ -34,9 +34,16 @@ def load_csv():
 
 def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
     '''
+<<<<<<< HEAD
+    takes raw df and:
+    tidies some nan columns,
+    renames district and ground columns,
+    removes price outliers.
+=======
     takes london re df and deletes all columns not needed as features for model,
     renames district and borough columns,
     removes nan values,
+>>>>>>> 3535b0cf2cfa90b6225370501127cb0a2b582005
     '''
     # replace nan values w empty strings
     df.fillna({'additional_info':''}, inplace=True)
@@ -74,6 +81,23 @@ def shorten_df(df):
     return df
 
 
+<<<<<<< HEAD
+def shorten_df(df):
+    """
+    dropping columns not needed for analysis, such as 'town', etc
+    and removes nan postcode values
+    """
+    # dropping columns
+    df.drop(columns=['day', 'number', 'street', 'additional_info',\
+        'full_property_number', 'borough', 'locality','town','county'], inplace=True)
+
+    # drop rows with NaN (3000 in postcode)
+    df.dropna(axis=0, how='any', inplace=True)
+    return df
+
+
+=======
+>>>>>>> 3535b0cf2cfa90b6225370501127cb0a2b582005
 
 # NOT NEEDED FOR NOW as we are working with the full postcode!!
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:

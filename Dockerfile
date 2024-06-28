@@ -11,8 +11,11 @@ COPY setup.py setup.py
 RUN pip install --upgrade pip
 RUN pip install -e .
 
+# Change into the project_code directory to run uvicorn
+WORKDIR "/project_code"
+
 # deploy to GCP
-CMD uvicorn project_code.api:app --reload --host 0.0.0.0 --port $PORT
+CMD uvicorn api:app --reload --host 0.0.0.0 --port $PORT
 
 # deploy locally
-# CMD uvicorn project_code.api:app --reload --host 0.0.0.0
+# CMD uvicorn api:app --reload --host 0.0.0.0
