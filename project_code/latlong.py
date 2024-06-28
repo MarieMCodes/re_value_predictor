@@ -7,7 +7,7 @@ import requests
 ### For Virtual Machine
 def load_csv():
     ''' loads london csv file from raw_data folder '''
-    file='london_real_estate_data.zip'
+    file='raw_data/london_real_estate_data.zip'
     df=pd.read_csv(file,
                 compression='zip',
                 dtype={'price': np.int32,'day':np.int16, 'month':np.int16,'year':np.int16}
@@ -150,33 +150,33 @@ def address_api_call():
     df_list=[]
     errors_list=[]
     # for loop to run through batches
-    for batch in batches:
+    for index,batch in enumerate(batches):
         # make api call
-        print(f"👉 starting api calls for {batch}")
+        print(f"👉 starting api calls for batch nr {index+2}")
         batch['lat_lon_a']=batch['address'].apply(get_coordinates)
 
         # separate out two col and clean nans
-        print(f"✅ api calls for {batch} complete")
+        print(f"✅ api calls for batch nr {index+2} complete")
         batch['lat']=batch['lat_lon_a'].apply(lambda x: x[0])
         batch['lon']=batch['lat_lon_a'].apply(lambda x: x[1])
         errors=batch[batch['lat_lon_a']=='ERROR']
-        print(f"❗️ {batch} contained {len(errors)} errors")
+        print(f"❗️ batch nr {index+2} contained {len(errors)} errors")
 
         #drop errors and nans
         batch.dropna(inplace=True)
         batch=batch[batch['lat_lon_a']!='ERROR']
 
         # write to csv
-        batch.to_csv(f'london_re_address_latlong_{batch}.zip', compression='zip',Index=False)
-        print(f"✅ csv of {batch} saved")
+        batch.to_csv(f'london_re_address_latlong_batch{index+2}.zip', compression='zip',Index=False)
+        print(f"✅ csv of batch nr {index+2} saved")
 
          # write errors to csv
-        errors.to_csv(f'london_re_address_latlon_{batch}_errors.zip', compression='zip',Index=False, float_format='%.7f')
+        errors.to_csv(f'london_re_address_latlon_batch{index+2}_errors.zip', compression='zip',Index=False, float_format='%.7f')
         print("✅ errors saved as csv")
 
         df_list.append(batch)
         errors_list.append(errors)
-        print(f"✅ 🙌 {batch} loop is done!")
+        print(f"✅ 🙌 batch nr {index+2} loop is done!")
 
     # stack dfs together row wise. if error try ignore_index=True
     df_master=pd.concat(df_list,axis=0)
@@ -189,6 +189,8 @@ def address_api_call():
     print(f"✅ 🙌 df master merge complete and saved as csv!")
 
     return df_master, errors_master
+
+# afterwards still need to tidy saved dataframe, and remove unneccessary columns
 
 
 # below code not working...?
