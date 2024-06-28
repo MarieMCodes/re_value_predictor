@@ -18,9 +18,10 @@ def load_sample_data(df: pd.DataFrame, n_samples: int = 5000, random_state: int 
 
 
 
+
 def load_csv():
     ''' loads london csv file from raw_data folder '''
-    file='../raw_data/london_real_estate_data.zip'
+    file='../raw_data/london_re_address_latlon_sample.zip'
     df=pd.read_csv(file,
                 compression='zip',
                 dtype={'price': np.int32,'day':np.int16, 'month':np.int16,'year':np.int16}
@@ -29,21 +30,37 @@ def load_csv():
 
 
 
+
+# columns of output df=['price', 'year', 'month', 'lat', 'lon', 'property_type','property_age', 'ownership']
+def load_tidy_latlong_sample():
+    """
+    loads csv w clean sample raw data (7T rows) w lat lon columns.
+    - total of 8 columns:
+    price, date, lat, lon, property_type, property_age, ownership (formerly ground),address
+    - dropping date and address columns
+    - has index
+    - output df has 6 columns
+    """
+    file='../raw_data/london_real_estate_data.zip'
+    df=pd.read_csv(file,
+               compression='zip',
+               dtype={'price': np.int32, 'month':np.int16,'year':np.int16, 'lat':np.float64, 'lon':np.float64}
+                  )
+
+    df.drop(labels=['date','address'], axis='columns', inplace=True)
+    return df
+
+
+
+
 # columns of tidy_df= ['price', 'date', 'postcode', 'property_type', 'property_age', 'ownership',
 #     'year', 'month']
 
 def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
     '''
-<<<<<<< HEAD
     takes raw df and:
     tidies some nan columns,
     renames district and ground columns,
-    removes price outliers.
-=======
-    takes london re df and deletes all columns not needed as features for model,
-    renames district and borough columns,
-    removes nan values,
->>>>>>> 3535b0cf2cfa90b6225370501127cb0a2b582005
     '''
     # replace nan values w empty strings
     df.fillna({'additional_info':''}, inplace=True)
@@ -80,24 +97,6 @@ def shorten_df(df):
 
     return df
 
-
-<<<<<<< HEAD
-def shorten_df(df):
-    """
-    dropping columns not needed for analysis, such as 'town', etc
-    and removes nan postcode values
-    """
-    # dropping columns
-    df.drop(columns=['day', 'number', 'street', 'additional_info',\
-        'full_property_number', 'borough', 'locality','town','county'], inplace=True)
-
-    # drop rows with NaN (3000 in postcode)
-    df.dropna(axis=0, how='any', inplace=True)
-    return df
-
-
-=======
->>>>>>> 3535b0cf2cfa90b6225370501127cb0a2b582005
 
 # NOT NEEDED FOR NOW as we are working with the full postcode!!
 def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
