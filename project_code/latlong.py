@@ -41,7 +41,6 @@ def tidy_df(df: pd.DataFrame) -> pd.DataFrame:
 
 #### Run Postcodes.io api to get lat long for postcodes
 
-
 def postcode_api(postcode):
     """
     makes api call to postcodes.io to get lat lon based on postcode
@@ -68,38 +67,73 @@ def postcodes_call():
     """
     data=load_csv()
     df=tidy_df(data)
-    print("✅ data loaded and cleaned")
+    print(f"✅ data loaded and cleaned, df has {len(df)} rows")
 
     # create new df with postcode nans
-    postcode_nans=df[df['postcode']==np.nan]
+    postcode_nans=df[df['postcode'].isna()==True]
 
     # drop postcode nans
-    df= df.dropna(subset=['postcode'])
-    print("✅ postcode nans separated out and dropped from df")
+    df=df[df['postcode'].isna()==False]
+    print(f"👉{len(postcode_nans)} nans in postcode removed")
+    print(f"✅  cleaned df has now {len(df)} rows")
 
-    # make api call
-    df['lat_lon']=df['postcode'].apply(postcode_api)
-    print("✅ postcode api calls done")
 
-    # separate out rows with Errors and add to postcode_nans
-    errors=df[df['lat_lon']=='ERROR']
-    print(f"✅ {len(errors)} rows of errors separated from df")
+    #Create batches to run api calls, starting most recent data first
+    first_chunk=df.iloc[3300000:,:]
+    second_chunk=df.iloc[2900000:3300000,:]
+    third_chunk=df.iloc[2400000:2900000,:]
+    fourth_chunk=df.iloc[1900000:2400000,:]
+    fifth_chunk=df.iloc[1200000:1900000,:]
+    sixth_chunk=df.iloc[500000:1200000,:]
+    seventh_chunk=df.iloc[:500000,:]
 
-    # create new lat lon columns
-    df['lat']=df['lat_lon'].apply(lambda x: x[0])
-    df['lon']=df['lat_lon'].apply(lambda x: x[1])
+    batches=[first_chunk,second_chunk,third_chunk,fourth_chunk,fifth_chunk,sixth_chunk, seventh_chunk]
+    df_list=[]
+    errors_list=[]
 
-    # write to csv
-    df.to_csv('london_re_postcodes_latlon.zip', compression='zip',Index=False, float_format='%.7f')
-    print("✅ saved csv")
+    # for loop to make api call
+    for index,batch in enumerate(batches):
+        # make api call
+        print(f"👉 starting api calls for batch nr {index+1}")
+        batch['lat_lon']=batch['postcode'].apply(postcode_api)
+        print(f"✅ api calls for batch nr {index+1} done")
+
+        # separate out rows with Errors and add to postcode_nans
+        errors=batch[batch['lat_lon']=='ERROR']
+        batch=batch[batch['lat_lon']!='ERROR']
+        print(f"❗️ batch nr {index+1} contained {len(errors)} errors")
+        print(f"👉 df has {len(batch)} clean rows ")
+
+        # create new lat lon columns
+        batch['lat']=batch['lat_lon'].apply(lambda x: x[0])
+        batch['lon']=batch['lat_lon'].apply(lambda x: x[1])
+
+        # write to csv
+        batch.to_csv(f'london_re_postcodes_latlon_batch_{index+1}.zip', compression='zip',index=False, float_format='%.7f')
+        print("✅ saved csv")
+
+        # write errors to csv
+        errors.to_csv(f'london_re_postcodes_latlon_batch_{index+1}_errors.zip', compression='zip',Index=False, float_format='%.7f')
+        print("✅ saved csv w errors")
+
+        df_list.append(batch)
+        errors_list.append(errors)
+
+        print(f"✅ 🙌 batch nr {index+1} loop is done!")
 
     # merge errors df w postcode nan df - append rows
-    missing_values=errors.concat(postcode_nans, axis=0)
+    # stack dfs together row wise. if error, try: ignore_index=True
+    errors_list.append(postcode_nans)
+    df_master=pd.concat(df_list,axis=0)
+    errors_master=pd.concat(errors_list,axis=0)
 
-    # write errors to csv
-    missing_values.to_csv('london_re_postcodes_latlon_errors.zip', compression='zip',Index=False, float_format='%.7f')
-    print("✅ saved csv w errors")
-    return df, missing_values
+    # write to csv
+    df_master.to_csv('london_re_postcodes_latlon_all.zip', compression='zip',index=False)
+    errors_master.to_csv('london_re_postcodes_latlon_all_errors.zip', compression='zip',index=False)
+
+    print(f"✅ 🙌 df master merge complete and saved as csv!")
+
+    return df_master, errors_master
 
 
 
@@ -132,64 +166,75 @@ def address_api_call():
     """
     data=load_csv()
     df=tidy_df(data)
-    print("✅ data loaded and cleaned")
+    print(f"✅ data loaded and cleaned, df has {len(df)} rows")
+
     # create address column for api call
     df['address']=df['number']+ " " + df['street'] + " " + df['borough'] + " London"
-    # NOW  - if vmcode fails clean nans
+
+    # remove NaNs and saves them to separate df
+    nans=df[df['address'].isna()==True]
+    print(f"👉{len(nans)} nans in address removed")
+
+    nans.to_csv(f'london_re_address_latlon_nans.zip', compression='zip',index=False)
+    print(f"👉 nans saved to csv")
+
+    df=df[df['address'].isna()==False]
+    print(f"✅ cleaned df has now {len(df)} rows")
+
 
     #Create batches to run api calls, starting most recent data first
-    second_chunk=df.iloc[3200000:,:]
-    third_chunk=df.iloc[2800000:3200000,:]
-    fourth_chunk=df.iloc[2400000:2800000,:]
-    fifth_chunk=df.iloc[1900000:2400000,:]
-    sixth_chunk=df.iloc[1200000:1900000,:]
-    seventh_chunk=df.iloc[500000:1200000,:]
-    #eigth_chunk=df.iloc[:500000,:]
+    first_chunk=df.iloc[3300000:,:]
+    second_chunk=df.iloc[2900000:3300000,:]
+    third_chunk=df.iloc[2400000:2900000,:]
+    fourth_chunk=df.iloc[1900000:2400000,:]
+    fifth_chunk=df.iloc[1200000:1900000,:]
+    sixth_chunk=df.iloc[500000:1200000,:]
+    seventh_chunk=df.iloc[:500000,:]
 
-    batches=[second_chunk,third_chunk,fourth_chunk,fifth_chunk,sixth_chunk, seventh_chunk]
+    batches=[first_chunk,second_chunk,third_chunk,fourth_chunk,fifth_chunk,sixth_chunk, seventh_chunk]
     df_list=[]
     errors_list=[]
     # for loop to run through batches
     for index,batch in enumerate(batches):
         # make api call
-        print(f"👉 starting api calls for batch nr {index+2}")
+        print(f"👉 starting api calls for batch nr {index+1}")
         batch['lat_lon_a']=batch['address'].apply(get_coordinates)
 
         # separate out two col and clean nans
-        print(f"✅ api calls for batch nr {index+2} complete")
+        print(f"✅ api calls for batch nr {index+1} complete")
         batch['lat']=batch['lat_lon_a'].apply(lambda x: x[0])
         batch['lon']=batch['lat_lon_a'].apply(lambda x: x[1])
         errors=batch[batch['lat_lon_a']=='ERROR']
-        print(f"❗️ batch nr {index+2} contained {len(errors)} errors")
+        print(f"❗️ batch nr {index+1} contained {len(errors)} errors")
 
         #drop errors and nans
         batch.dropna(inplace=True)
         batch=batch[batch['lat_lon_a']!='ERROR']
 
         # write to csv
-        batch.to_csv(f'london_re_address_latlong_batch{index+2}.zip', compression='zip',Index=False)
-        print(f"✅ csv of batch nr {index+2} saved")
+        batch.to_csv(f'london_re_address_latlon_batch{index+1}.zip', compression='zip',index=False)
+        print(f"✅ csv of batch nr {index+1} saved")
 
          # write errors to csv
-        errors.to_csv(f'london_re_address_latlon_batch{index+2}_errors.zip', compression='zip',Index=False, float_format='%.7f')
+        errors.to_csv(f'london_re_address_latlon_batch{index+1}_errors.zip', compression='zip',index=False, float_format='%.7f')
         print("✅ errors saved as csv")
 
         df_list.append(batch)
         errors_list.append(errors)
-        print(f"✅ 🙌 batch nr {index+2} loop is done!")
+        print(f"✅ 🙌 batch nr {index+1} loop is done!")
 
-    # stack dfs together row wise. if error try ignore_index=True
+    # stack dfs together row wise. if error, try: ignore_index=True
+    errors_list.append(nans)
     df_master=pd.concat(df_list,axis=0)
     errors_master=pd.concat(errors_list,axis=0)
 
     # write to csv
-    df_master.to_csv(f'london_re_address_latlong_all.zip', compression='zip',Index=False)
-    errors_master.to_csv(f'london_re_address_latlon_all_errors.zip', compression='zip',Index=False)
+    df_master.to_csv('london_re_address_latlon_all.zip', compression='zip',index=False)
+    errors_master.to_csv('london_re_address_latlon_all_errors.zip', compression='zip',index=False)
 
     print(f"✅ 🙌 df master merge complete and saved as csv!")
 
     return df_master, errors_master
-
 # afterwards still need to tidy saved dataframe, and remove unneccessary columns
 
 
