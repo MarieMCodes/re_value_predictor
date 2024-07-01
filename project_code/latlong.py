@@ -79,29 +79,29 @@ def postcodes_call():
 
 
     #Create batches to run api calls, starting most recent data first
-    first_chunk=df.iloc[3300000:,:]
-    second_chunk=df.iloc[2900000:3300000,:]
-    third_chunk=df.iloc[2400000:2900000,:]
+    # first_chunk=df.iloc[3300000:,:] - DONE data retrieved
+    second_chunk=df.iloc[3000000:3300000,:]
+    third_chunk=df.iloc[2400000:3000000,:]
     fourth_chunk=df.iloc[1900000:2400000,:]
     fifth_chunk=df.iloc[1200000:1900000,:]
     sixth_chunk=df.iloc[500000:1200000,:]
     seventh_chunk=df.iloc[:500000,:]
 
-    batches=[first_chunk,second_chunk,third_chunk,fourth_chunk,fifth_chunk,sixth_chunk, seventh_chunk]
+    batches=[second_chunk,third_chunk,fourth_chunk,fifth_chunk,sixth_chunk, seventh_chunk]
     df_list=[]
     errors_list=[]
 
     # for loop to make api call
     for index,batch in enumerate(batches):
         # make api call
-        print(f"👉 starting api calls for batch nr {index+1}")
+        print(f"👉 starting api calls for batch nr {index+2}")
         batch['lat_lon']=batch['postcode'].apply(postcode_api)
-        print(f"✅ api calls for batch nr {index+1} done")
+        print(f"✅ api calls for batch nr {index+2} done")
 
         # separate out rows with Errors and add to postcode_nans
         errors=batch[batch['lat_lon']=='ERROR']
         batch=batch[batch['lat_lon']!='ERROR']
-        print(f"❗️ batch nr {index+1} contained {len(errors)} errors")
+        print(f"❗️ batch nr {index+2} contained {len(errors)} errors")
         print(f"👉 df has {len(batch)} clean rows ")
 
         # create new lat lon columns
@@ -109,17 +109,17 @@ def postcodes_call():
         batch['lon']=batch['lat_lon'].apply(lambda x: x[1])
 
         # write to csv
-        batch.to_csv(f'london_re_postcodes_latlon_batch_{index+1}.zip', compression='zip',index=False, float_format='%.7f')
+        batch.to_csv(f'london_re_postcodes_latlon_batch_{index+2}.zip', compression='zip',index=False, float_format='%.7f')
         print("✅ saved csv")
 
         # write errors to csv
-        errors.to_csv(f'london_re_postcodes_latlon_batch_{index+1}_errors.zip', compression='zip',Index=False, float_format='%.7f')
+        errors.to_csv(f'london_re_postcodes_latlon_batch_{index+2}_errors.zip', compression='zip',index=False, float_format='%.7f')
         print("✅ saved csv w errors")
 
         df_list.append(batch)
         errors_list.append(errors)
 
-        print(f"✅ 🙌 batch nr {index+1} loop is done!")
+        print(f"✅ 🙌 batch nr {index+2} loop is done!")
 
     # merge errors df w postcode nan df - append rows
     # stack dfs together row wise. if error, try: ignore_index=True
