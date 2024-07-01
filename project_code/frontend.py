@@ -31,13 +31,13 @@ def main(env='local'):
 
     if year and month and day and postcode and property_type and property_age and ground:
         params = {
-            'user_year': int(year),
-            'user_month': int(month),
-            'user_day': int(day),
-            'user_postcode': str(postcode),
-            'user_property_type': str(property_type),
-            'user_property_age': str(property_age),
-            'user_ground': str(ground),
+            'year': int(year),
+            'month': int(month),
+            'day': int(day),
+            'postcode': str(postcode),
+            'property_type': str(property_type),
+            'property_age': str(property_age),
+            'ground': str(ground),
         }
         input_complete = True
         # Method 1 - local
@@ -57,7 +57,7 @@ def main(env='local'):
         if st.button("Model Prediction") and input_complete:
             # st.write(f'{url}/{params}')
             response = requests.get(url=url, params=params).json()
-            st.write('The answer is', str(response['prediction:']))
+            st.write('Log of prediction:', str(response['prediction']))
     except UnboundLocalError:
         st.write('No input or input incomplete.')
 

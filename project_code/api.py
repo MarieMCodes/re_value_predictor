@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
+from json import JSONDecodeError
 import pickle
 
 import pandas as pd
@@ -19,29 +20,31 @@ def root():
 
 
 @app.get('/predict')
-def predict(user_year, user_month, user_day, user_postcode, user_property_type, user_property_age, user_ground):
+def predict(year, month, day, postcode, property_type, property_age, ground):
     userinput = {
-        'year': [user_year],
-        'month': [user_month],
-        'day': [user_day],
-        'postcode': [user_postcode],
-        'property_type': [user_property_type],
-        'property_age': [user_property_age],
-        'ground': [user_ground]
+        'year': [year],
+        'month': [month],
+        'day': [day],
+        'postcode': [postcode],
+        'property_type': [property_type],
+        'property_age': [property_age],
+        'ground': [ground]
     }
     with open('../models/preprocessor.pkl', 'rb') as processor_file:
         # preprocess
         preprocessor = pickle.load(processor_file)
         df_userinput = pd.DataFrame(userinput, index=[0])
         transformed_userinput = preprocessor.transform(df_userinput)
-        print(transformed_userinput)
+
         # load model and predict
-        # print('This is BEFORE we load the model')  # - code debuggers
-        model = keras.models.load_model('../models/model.h5')
-        # print('NOW is AFTER we load the model') # - code debuggers
+        model = keras.models.load_model('../models/model.h5', compile=False)
         prediction_log_return = model.predict(transformed_userinput).flatten()[0]
-        # print('END: flattened and returned the prediction_log_return: {prediction_log_return}') # - code debuggers
-        return {'prediction':prediction_log_return}
+        return {'prediction': float(prediction_log_return)}
+
+
+if __name__ == '__main__':
+    prediction = predict(user_year=2022, user_month=6, user_day=21, user_postcode='N1 2JU', user_property_type='F', user_property_age='N', user_ground='F')
+    print(f'The prediction for the default values is: {prediction}')
 
 # sample_data = {
 #     'year': [2022],
@@ -52,7 +55,3 @@ def predict(user_year, user_month, user_day, user_postcode, user_property_type, 
 #     'property_age': ['N'],
 #     'ground': ['F']
 # }
-
-if __name__ == '__main__':
-    prediction = predict(user_year=2022, user_month=6, user_day=21, user_postcode='N1 2JU', user_property_type='F', user_property_age='N', user_ground='F')
-    print(f'The prediction for the default values is: {prediction}')
