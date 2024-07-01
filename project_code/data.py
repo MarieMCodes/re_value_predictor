@@ -21,10 +21,10 @@ def load_sample_data(df: pd.DataFrame, n_samples: int = 5000, random_state: int 
 
 def load_csv():
     ''' loads london csv file from raw_data folder '''
-    file='../raw_data/london_re_address_latlon_sample.zip'
+    file='raw_data/london_real_estate_data.zip'
     df=pd.read_csv(file,
                 compression='zip',
-                dtype={'price': np.int32,'day':np.int16, 'month':np.int16,'year':np.int16}
+                dtype={'price': np.int32,'day':np.int8, 'month':np.int8,'year':np.int16}
     )
     return df
 
@@ -41,7 +41,7 @@ def load_tidy_latlong_sample():
     - has index
     - output df has 6 columns
     """
-    file='../raw_data/london_real_estate_data.zip'
+    file='../raw_data/london_re_address_latlon_sample.zip'
     df=pd.read_csv(file,
                compression='zip',
                dtype={'price': np.int32, 'month':np.int16,'year':np.int16, 'lat':np.float64, 'lon':np.float64}
@@ -98,21 +98,15 @@ def shorten_df(df):
     return df
 
 
-# NOT NEEDED FOR NOW as we are working with the full postcode!!
-def feature_engineering(df: pd.DataFrame) -> pd.DataFrame:
+
+def seasonality_engineering(df: pd.DataFrame) -> pd.DataFrame:
     '''
-    taking dataframe and adding new columns:
-    - 2 and 3 chars shortened postcodes,
-    - sin cos for months
+    taking dataframe and adding 2 new columns:
+    - sin cos for months / seasonality of sales & prices
     returns df
     '''
-    # add shortened postcodes - choose one of the the below
-    df['short2_pc']=df[['postcode']].apply(lambda x: x.str[:2])
-    #df['short3_pc']=df[['postcode']].apply(lambda x: x.str[:3])
-
-    # dropping postcode
-    # df.drop(columns='postcode', inplace=True)
-
-    # add sin cos feature engineering
-
+    # transforming month column
+    months_in_year=12
+    df['sin_time'] = np.sin(2*np.pi*df.month/months_in_year)
+    df['cos_time'] = np.cos(2*np.pi*df.month/months_in_year)
     return df
