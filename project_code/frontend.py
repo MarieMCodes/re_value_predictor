@@ -16,6 +16,9 @@ def main(env='local'):
     #input month
     month = st.select_slider(label="Select the month number:",
     options=[1,2,3,4,5,6,7,8,9,10,11,12])
+    #input day
+    day = st.selectbox(label="Select day:",
+    options=[num for num in range(1,32)])
     #input postcode
     postcode = st.text_input(label='Enter your postcode:', value='')
     #input property_type
@@ -26,10 +29,11 @@ def main(env='local'):
     ground = st.radio(label='Ground', options=['L','F'])
 
 
-    if year and month and postcode and property_type and property_age and ground:
+    if year and month and day and postcode and property_type and property_age and ground:
         params = {
             'user_year': int(year),
             'user_month': int(month),
+            'user_day': int(day),
             'user_postcode': str(postcode),
             'user_property_type': str(property_type),
             'user_property_age': str(property_age),
