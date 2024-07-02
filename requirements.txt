@@ -1,9 +1,12 @@
 #API
 fastapi==0.111.0
 uvicorn==0.30.1
+fastapi.middleware.cors
 
 #APP
-streamlit==1.22.0
+streamlit
+watchdog
+
 
 #.env
 python-dotenv==1.0.1
