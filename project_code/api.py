@@ -43,7 +43,7 @@ def predict(year, month, day, postcode, property_type, property_age, ground):
 
 
 if __name__ == '__main__':
-    prediction = predict(user_year=2022, user_month=6, user_day=21, user_postcode='N1 2JU', user_property_type='F', user_property_age='N', user_ground='F')
+    prediction = predict(year=2023, month=6, day=21, postcode='N1 2JU', property_type='F', property_age='O', ground='L')
     print(f'The prediction for the default values is: {prediction}')
 
 # sample_data = {
