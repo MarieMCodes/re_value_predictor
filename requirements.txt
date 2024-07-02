@@ -3,10 +3,11 @@ fastapi==0.111.0
 uvicorn==0.30.1
 fastapi.middleware.cors
 
-#APP
-streamlit
-watchdog
 
+
+#APP
+streamlit==1.22.0
+watchdog
 
 #.env
 python-dotenv==1.0.1
@@ -20,6 +21,4 @@ DateTime==5.5
 scikit-learn==1.2.2
 
 # Deep Learning
-# tensorflow-macos==2.10.0; sys_platform == 'darwin' and 'ARM' in platform_version
-# tensorflow-macos; sys_platform == 'darwin' and 'ARM' in platform_version
 tensorflow==2.10.0
