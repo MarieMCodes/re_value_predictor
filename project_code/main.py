@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from preprocessor import preprocess_data, split_data, preprocess_features,feature_target
+from preprocessor import preprocess_fit_X, split_data, feature_target
 from model_2 import initialize_model, compile_model, train_model, evaluate_model
 from tensorflow.keras.models import save_model, load_model
 import pickle
@@ -26,14 +26,13 @@ def run_initial_training():
 
     X,y=feature_target(data)
     # preprocess whole df
-    preprocessor_fitted=preprocess_data(X)
+    preprocessor_fitted=preprocess_fit_X(X)
+
+    # Export processor as pickle file
+    with open("../models/preprocessor_latlon.pkl","wb") as file:
+        pickle.dump(preprocessor_fitted,file)
 
     X_processed= preprocessor_fitted.transform(X)
-    # Export processor as pickle file
-    with open("../models/preprocessor_latlon.pkl", "wb") as file:
-	    pickle.dump(preprocessor_fitted, file)
-
-
     print(f'✅ data processed with shape (X) {X_processed.shape}')
 
     # split the processed X and y
@@ -51,7 +50,7 @@ def run_initial_training():
     print('✅ model finished training')
 
     #save model
-    model.save('../models/london_re_model_latlon_sample')
+    model.save_model('../models/london_re_model_latlon_sample')
     print('✅ model saved ')
 
     # evaluate

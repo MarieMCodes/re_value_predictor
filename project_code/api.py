@@ -1,18 +1,19 @@
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from json import JSONDecodeError
 import pickle
 
 import pandas as pd
-import tensorflow as tf
-from tensorflow import keras
+import numpy as np
+#import tensorflow as tf
+#from tensorflow import keras
+from tensorflow.keras.models import load_model
 
-from sklearn.impute import SimpleImputer
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler,RobustScaler, OneHotEncoder
-# from sklearn.metrics import mean_absolute_error, mean_squared_error
-# from sklearn.model_selection import KFold
 
 app = FastAPI()
+
+# load model into cache (memory) of uvicorn
+app.state.model = load_model('../models/london_re_model_latlon_sample')
 
 @app.get('/')
 def root():
@@ -20,38 +21,39 @@ def root():
 
 
 @app.get('/predict')
-def predict(year, month, day, postcode, property_type, property_age, ground):
-    userinput = {
-        'year': [year],
-        'month': [month],
-        'day': [day],
-        'postcode': [postcode],
-        'property_type': [property_type],
-        'property_age': [property_age],
-        'ground': [ground]
-    }
-    with open('../models/preprocessor.pkl', 'rb') as processor_file:
-        # preprocess
-        preprocessor = pickle.load(processor_file)
-        df_userinput = pd.DataFrame(userinput, index=[0])
-        transformed_userinput = preprocessor.transform(df_userinput)
+def predict(year: int,
+            property_type: str,
+            property_age: str,
+            ownership: str,
+            lat: float,
+            lon: float,
+            sin_time: float,
+            cos_time: float):
 
-        # load model and predict
-        model = keras.models.load_model('../models/model.h5', compile=False)
-        prediction_log_return = model.predict(transformed_userinput).flatten()[0]
-        return {'prediction': float(prediction_log_return)}
+    # load user input in correct format
+    X_user = pd.DataFrame(locals(),index=[0])
+
+    #load preprocessor
+    preprocessor=pickle.load(open("../models/preprocessor_latlon.pkl","rb"))
+
+    #preprocess user input
+    X_user_processed=preprocessor.transform(X_user)
+
+    # load cached model and predict
+    model=app.state.model
+    y_pred=model.predict(X_user_processed)
+    prediction=np.exp(y_pred)[0][0]
+
+    return {'prediction in £': int(prediction)}
 
 
 if __name__ == '__main__':
-    prediction = predict(year=2023, month=6, day=21, postcode='N1 2JU', property_type='F', property_age='O', ground='L')
+    prediction = predict(year=2023,
+                         property_type='F',
+                         property_age='O',
+                         ownership='L',
+                         lat=51.491539,
+                         lon=0.026218,
+                         sin_time=0.5,
+                         cos_time=0.85)
     print(f'The prediction for the default values is: {prediction}')
-
-# sample_data = {
-#     'year': [2022],
-#     'month': [6],
-#     'day': [21],
-#     'postcode': [N1 2JU],
-#     'property_type': ['F'],
-#     'property_age': ['N'],
-#     'ground': ['F']
-# }

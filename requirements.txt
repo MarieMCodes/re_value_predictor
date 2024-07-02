@@ -1,9 +1,11 @@
 #API
 fastapi
 uvicorn
+fastapi.middleware.cors
 
 #APP
 streamlit
+watchdog
 
 #.env
 #python-dotenv
