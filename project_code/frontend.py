@@ -1,10 +1,9 @@
 import streamlit as st
 import sys
-
-
-
 import datetime as dt
 import requests
+
+
 def main(env='local'):
     # web page title
     st.title('London Real Estate Value Predictor')
