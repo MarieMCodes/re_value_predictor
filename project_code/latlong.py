@@ -144,7 +144,7 @@ def get_coordinates(address):
     """
     makes api call to openstreet to get lat lon and address based on address
     """
-    url="https://nominatim.openstreetmap.org/"
+    url="https://nominatim.openstreetmap.org/search?"
     try:
         params={"q": address, "format": "json"}
         response=requests.get(url,params=params).json()
@@ -154,7 +154,7 @@ def get_coordinates(address):
         return lat, lon #, full_address
     except:
         return "ERROR"
-
+# https://nominatim.openstreetmap.org/q?Westminster%20Abbey&format=json
 
 def address_api_call():
     """

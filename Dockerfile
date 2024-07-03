@@ -1,4 +1,10 @@
-FROM python:3.8.12-slim
+FROM python:3.10.14-bookworm
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y pkg-config libhdf5-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy all the needed files that we need to run the container
 COPY requirements.txt requirements.txt
@@ -15,7 +21,7 @@ RUN pip install -e .
 WORKDIR "/project_code"
 
 # deploy to GCP
-CMD uvicorn api:app --reload --host 0.0.0.0 --port $PORT
+# CMD uvicorn api:app --reload --host 0.0.0.0 --port $PORT
 
 # deploy locally
-# CMD uvicorn api:app --reload --host 0.0.0.0
+CMD uvicorn api:app --reload --host 0.0.0.0

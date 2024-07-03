@@ -3,3 +3,4 @@ raw_data/
 __pycache__
 .DS_Store
 notebooks/romtriestuff.ipynb
+current_pip_freeze.txt
