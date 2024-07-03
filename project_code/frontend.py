@@ -1,6 +1,4 @@
 import streamlit as st
-import sys
-import datetime as dt
 import requests
 
 
@@ -12,32 +10,36 @@ def main(env='local'):
 
     # input year
     year = st.text_input(label='Select the year:', value='', autocomplete='202')
-    #input month
-    month = st.select_slider(label="Select the month number:",
-    options=[1,2,3,4,5,6,7,8,9,10,11,12])
-    #input day
-    day = st.selectbox(label="Select day:",
-    options=[num for num in range(1,32)])
-    #input postcode
-    postcode = st.text_input(label='Enter your postcode:', value='')
+    #input sin_time
+    sin_time = st.text_input(label='Sin Time:', value='')
+    #input cos_time
+    cos_time = st.text_input(label='Cos Time:', value='')
     #input property_type
     property_type = st.radio(label='Choose property type: F, T, S, D or O ', options=['F', 'T', 'S', 'D' ,'O'])
     #input property_age
     property_age = st.radio(label='Choose property age: O-Old, N-New', options=['O','N'])
-    #input ground
-    ground = st.radio(label='Ground', options=['L','F'])
+    #input lat
+    lat = st.number_input(label='Latitude')
+    #input lon
+    lon = st.number_input(label='Longitude')
+    #input ownership
+    ownership = st.text_input(label='Ownership')
 
 
-    if year and month and day and postcode and property_type and property_age and ground:
+    if year and sin_time and cos_time and ownership and property_type and property_age and lon and lat:
         params = {
-            'year': int(year),
-            'month': int(month),
-            'day': int(day),
-            'postcode': str(postcode),
-            'property_type': str(property_type),
-            'property_age': str(property_age),
-            'ground': str(ground),
+            'year': year,
+            'property_type': property_type,
+            'property_age': property_age,
+            'ownership': ownership,
+            'lat': lat,
+            'lon': lon,
+            'sin_time': sin_time,
+            'cos_time': cos_time
         }
+
+
+
         input_complete = True
         # Method 1 - local
         local_url_address_base = 'http://127.0.0.1:8000'
@@ -56,7 +58,8 @@ def main(env='local'):
         if st.button("Model Prediction") and input_complete:
             # st.write(f'{url}/{params}')
             response = requests.get(url=url, params=params).json()
-            st.write('Log of prediction:', str(response['prediction']))
+            nice_price = str(format(response['prediction in £'], ","))
+            st.write('Sale Price Prediction: £', nice_price)
     except UnboundLocalError:
         st.write('No input or input incomplete.')
 

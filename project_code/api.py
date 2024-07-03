@@ -1,6 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from json import JSONDecodeError
+from fastapi import FastAPI
 import pickle
 
 import pandas as pd
