@@ -20,7 +20,7 @@ def run_initial_training():
     """
     data=pd.read_csv('../raw_data/london_re_postcodes_latlon_master.zip',
                     dtype={'price': np.int32,'month':np.int16,'year':np.int16},
-                    ).sample(400000)
+                    )#.sample(400000)
     # master: drop month, drop date
     data.drop(columns=['date','month'],inplace=True)
     print('✅ data loaded')
@@ -51,7 +51,7 @@ def run_initial_training():
     print('✅ model finished training')
 
     #save model
-    save_model(model, '../models/model_latlon_sample.h5')
+    save_model(model, '../models/model_latlon_full.h5')
     print('✅ model saved ')
 
     # evaluate
@@ -86,7 +86,7 @@ def prediction(year=2023,
     print(f"✅ new data processed with shape {X_new_processed.shape}")
 
     #load model
-    model=load_model('../models/london_re_model_latlon_sample')
+    model=load_model('../models/london_re_model_latlon_full.h5')
     print("✅ model loaded")
 
     # predict
