@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-
+from latlong import get_coordinates
 
 def main(env='local'):
     # web page title
@@ -18,10 +18,13 @@ def main(env='local'):
     property_type = st.radio(label='Choose property type: F, T, S, D or O ', options=['F', 'T', 'S', 'D' ,'O'])
     #input property_age
     property_age = st.radio(label='Choose property age: O-Old, N-New', options=['O','N'])
-    #input lat
-    lat = st.number_input(label='Latitude')
-    #input lon
-    lon = st.number_input(label='Longitude')
+
+    #input address
+    address = st.text_input(label='Input your London address here...')
+    if address:
+        #input lat, lon
+        lat, lon = get_coordinates(address)
+
     #input ownership
     ownership = st.text_input(label='Ownership')
 
