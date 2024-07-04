@@ -48,7 +48,7 @@ def predict(year: int,
 if __name__ == '__main__':
     prediction = predict(year=2023,
                          property_type='F',
-                         property_age='O',
+                         property_age='N',
                          ownership='L',
                          lat=51.491539,
                          lon=0.026218,

@@ -98,13 +98,13 @@ def prediction(year=2023,
     print(f" Your predicted price for the property is: {prediction}")
     return prediction
 
-
+# y = new build  n = old buildingßß
 if __name__ == '__main__':
     run_initial_training()
-    # prediction = prediction(year=2023,property_type='F', property_age='O',
+    # prediction = prediction(year=2023,property_type='F', property_age='Y',
     # ownership='L',
     # lat=51.491539,
     # lon=0.026218,
-    # sin_time=0.5,
+    # sin_time=0.5,ß
     # cos_time=0.85
     # )
