@@ -11,7 +11,7 @@ from tensorflow.keras.models import load_model
 app = FastAPI()
 
 # load model into cache (memory) of uvicorn
-app.state.model = load_model('../models/london_re_model_latlon_sample')
+app.state.model = load_model('../models/london_re_model_latlon_full.h5')
 
 @app.get('/')
 def root():

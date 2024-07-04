@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from preprocessor import preprocess_fit_X, split_data, feature_target
 from model_2 import initialize_model, compile_model, train_model, evaluate_model
+#from tensorflow.keras import model
 from tensorflow.keras.models import save_model, load_model
 import pickle
 
@@ -19,7 +20,7 @@ def run_initial_training():
     """
     data=pd.read_csv('../raw_data/london_re_postcodes_latlon_master.zip',
                     dtype={'price': np.int32,'month':np.int16,'year':np.int16},
-                    ).sample(100000)
+                    )#.sample(400000)
     # master: drop month, drop date
     data.drop(columns=['date','month'],inplace=True)
     print('✅ data loaded')
@@ -30,7 +31,7 @@ def run_initial_training():
 
     # Export processor as pickle file
     with open("../models/preprocessor_latlon.pkl","wb") as file:
-        pickle.dump(preprocessor_fitted,file)
+        pickle.dump(preprocessor_fitted, file)
 
     X_processed= preprocessor_fitted.transform(X)
     print(f'✅ data processed with shape (X) {X_processed.shape}')
@@ -50,7 +51,7 @@ def run_initial_training():
     print('✅ model finished training')
 
     #save model
-    model.save_model('../models/london_re_model_latlon_sample')
+    save_model(model, '../models/model_latlon_full.h5')
     print('✅ model saved ')
 
     # evaluate
@@ -85,7 +86,7 @@ def prediction(year=2023,
     print(f"✅ new data processed with shape {X_new_processed.shape}")
 
     #load model
-    model=load_model('../models/london_re_model_latlon_sample')
+    model=load_model('../models/london_re_model_latlon_full.h5')
     print("✅ model loaded")
 
     # predict
@@ -100,10 +101,10 @@ def prediction(year=2023,
 
 if __name__ == '__main__':
     run_initial_training()
-    prediction = prediction(year=2023,property_type='F', property_age='O',
-    ownership='L',
-    lat=51.491539,
-    lon=0.026218,
-    sin_time=0.5,
-    cos_time=0.85
-    )
+    # prediction = prediction(year=2023,property_type='F', property_age='O',
+    # ownership='L',
+    # lat=51.491539,
+    # lon=0.026218,
+    # sin_time=0.5,
+    # cos_time=0.85
+    # )
