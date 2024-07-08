@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+streamlit
+seaborn
+plotly
+matplotlib
+numpy==1.23.5
+pandas==1.5.3
+datetime
+nbdime
+scikit-learn==1.2.2

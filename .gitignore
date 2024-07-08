@@ -1,6 +1,5 @@
-raw_data/
+project_code.egg-info/
 .env
-__pycache__
-.DS_Store
-notebooks/romtriestuff.ipynb
-current_pip_freeze.txt
+notebooks/
+__pycache__/
+raw_data/
