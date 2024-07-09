@@ -25,7 +25,7 @@ def build_dense_model(input_shape):
     return model
 
 
-def process_and_train(file_path, chunk_size, model=None, preprocessor=None, batch_size=64):
+def process_and_train(file_path, chunk_size, model=None, preprocessor=None, batch_size=64, patience=5):
     scaler_y = StandardScaler()
     y_scaler_fitted = False
     
