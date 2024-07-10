@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from preprocessor import preprocess_fit_X, split_data, feature_target
-from model_2 import initialize_model, compile_model, train_model, evaluate_model
+from model import initialize_model, compile_model, train_model, evaluate_model
 #from tensorflow.keras import model
 from tensorflow.keras.models import save_model, load_model
 import pickle
@@ -18,44 +18,53 @@ def run_initial_training():
     instantiating model, compiling, training and evaluating.
     Output MAE and MSE
     """
+    # data is already stripped of properties <200k and above 15Ml
     data=pd.read_csv('../raw_data/london_re_postcodes_latlon_master.zip',
                     dtype={'price': np.int32,'month':np.int16,'year':np.int16},
                     )#.sample(400000)
     # master: drop month, drop date
     data.drop(columns=['date','month'],inplace=True)
-    print('✅ data loaded')
 
-    X,y=feature_target(data)
-    # preprocess whole df
-    preprocessor_fitted=preprocess_fit_X(X)
+    # remove premium price outliers
+    clean_data=data[(data['price']<2500000) & (data['price']>199000)]
+    print('✅ data loaded and cleaned')
+
+    X,y=feature_target(clean_data)
+    # split the X and y
+    X_train, X_test, y_train, y_test= split_data(X,y)
+    print('✅ data split')
+
+    # fit preprocessor on training set
+    preprocessor_fitted=preprocess_fit_X(X_train)
+    print(" ✅ X_train fitted and saved preprocessor")
 
     # Export processor as pickle file
-    with open("../models/preprocessor_latlon.pkl","wb") as file:
+    with open("../models/preprocessor_final.pkl","wb") as file:
         pickle.dump(preprocessor_fitted, file)
 
-    X_processed= preprocessor_fitted.transform(X)
-    print(f'✅ data processed with shape (X) {X_processed.shape}')
+    # transfrom X_train,X_test
+    X_train_processed= preprocessor_fitted.transform(X_train)
+    X_test_processed= preprocessor_fitted.transform(X_test)
+    print(f'✅ X_train processed with shape {X_train_processed.shape}')
+    print(f'✅ X_test processed with shape {X_test_processed.shape}')
 
-    # split the processed X and y
-    X_train, X_test, y_train, y_test= split_data(X_processed,y)
-    print('✅ data split, next step initialising model')
 
     # initialise_model
     model=initialize_model()
 
     # compile_model
-    model=compile_model(model,learning_rate=0.001, epochs=80 )
+    model=compile_model(model)
 
     # train_model
-    model=train_model(model,X_train,y_train)[0]
+    model=train_model(model,X_train_processed,y_train)[0]
     print('✅ model finished training')
 
     #save model
-    save_model(model, '../models/model_latlon_full.h5')
+    save_model(model, '../models/model_final.h5')
     print('✅ model saved ')
 
     # evaluate
-    mae, mse=evaluate_model(model,X_test,y_test)
+    mae, mse=evaluate_model(model,X_test_processed,y_test)
     print(f'MAE is {mae}, and MSE is {mse}. Training is complete')
     return  mae,mse
 
@@ -66,14 +75,14 @@ def run_initial_training():
 
 # will stil need to create a converter from address (or postcode)
 # to lat lon and month to sin cos
-def prediction(year=2023,
+def prediction(year=2026,
     property_type='F',
-    property_age='O',
+    property_age='N',
     ownership='L',
-    lat=51.491539,
-    lon=0.026218,
-    sin_time=0.5,
-    cos_time=0.85):
+    lat=51.5487553,
+    lon=-0.1235217,
+    sin_time=-0.5,
+    cos_time=-0.866025):
     """
     takes new X, processes them and predicts
     """
@@ -81,12 +90,12 @@ def prediction(year=2023,
     print(f"✅ new data loaded in df with shape {X_new.shape}")
 
     # load preprocessor
-    preprocessor=pickle.load(open("../models/preprocessor_latlon.pkl","rb"))
+    preprocessor=pickle.load(open("../models/preprocessor_final.pkl","rb"))
     X_new_processed=preprocessor.transform(X_new)
     print(f"✅ new data processed with shape {X_new_processed.shape}")
 
     #load model
-    model=load_model('../models/london_re_model_latlon_full.h5')
+    model=load_model('../models/model_final.h5')
     print("✅ model loaded")
 
     # predict
@@ -95,16 +104,19 @@ def prediction(year=2023,
 
     # reverse log price to actual price
     prediction=np.exp(ypred)
-    print(f" Your predicted price for the property is: {prediction}")
+    print(f" Your predicted price for the property in {year} is: {prediction}")
     return prediction
 
-# y = new build  n = old buildingßß
+# y = new build  n = old building
 if __name__ == '__main__':
-    run_initial_training()
-    # prediction = prediction(year=2023,property_type='F', property_age='Y',
+    #run_initial_training()
+    prediction = prediction()
+    # year=2023,
+    # property_type='F',
+    # property_age='N',
     # ownership='L',
     # lat=51.491539,
     # lon=0.026218,
-    # sin_time=0.5,ß
+    # sin_time=0.5,
     # cos_time=0.85
     # )
