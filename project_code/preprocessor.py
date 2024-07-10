@@ -52,7 +52,7 @@ def preprocess_fit_X(X: pd.DataFrame):
     return preprocessor_fitted
 
 
-def split_data(X: np.ndarray, y: np.ndarray, test_size: float = 0.3):
+def split_data(X: np.ndarray, y: np.ndarray, test_size: float = 0.2):
     """
     splits X and y into X_train, X_test, y_train, y_test
     """

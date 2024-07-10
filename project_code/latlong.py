@@ -142,7 +142,7 @@ def postcodes_call():
 # removed full address for now to get faster api return...
 def get_coordinates(address):
     """
-    makes api call to openstreet to get lat lon and address based on address
+    makes api call to openstreet to get lat lon based on address
     """
     url="https://nominatim.openstreetmap.org/search?"
     try:
@@ -151,9 +151,12 @@ def get_coordinates(address):
         lat=response[0]["lat"]
         lon=response[0]["lon"]
         #full_address=response[0]["display_name"]
-        return lat, lon #, full_address
+        return lat, lon
     except:
         return "ERROR"
+
+
+
 # https://nominatim.openstreetmap.org/q?Westminster%20Abbey&format=json
 
 def address_api_call():
