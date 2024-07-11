@@ -14,10 +14,11 @@ def main(env='local'):
     sin_time = st.text_input(label='Sin Time:', value='')
     #input cos_time
     cos_time = st.text_input(label='Cos Time:', value='')
-    #input property_type - Flat, New Development, Duplex, Penthouse, Studio, Bungalow, Mews
-    property_type = st.radio(label='Choose property type: F, T, S, D or O ', options=['F', 'T', 'S', 'D' ,'O'])
+    #input property_type
+    property_type = st.radio(label='Choose property type: F- Flat, T- Terraced, S- Semi-detached, D- Detached',
+                             options=['F', 'T', 'S', 'D'])
     #input property_age
-    property_age = st.radio(label='Choose property age: O-Old, N-New', options=['O','N'])
+    property_age = st.radio(label='Choose property age: N - Old, Y - New', options=['N','Y'])
 
     #input address
     address = st.text_input(label='Input your London address here...')
@@ -26,7 +27,7 @@ def main(env='local'):
         lat, lon = get_coordinates(address)
 
     #input ownership
-    ownership = st.text_input(label='Ownership')
+    ownership = st.radio(label='Choose ownership type: F- Freehold, L- Leasehold', options=['F','L'])
 
 
     if year and sin_time and cos_time and ownership and property_type and property_age and lon and lat:

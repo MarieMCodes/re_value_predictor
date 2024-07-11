@@ -42,7 +42,7 @@ def train_model(
         X_train: np.ndarray,
         y_train: np.ndarray,
         batch_size=64,
-        patience=2,
+        patience=10,
         validation_data=None,
         validation_split=0.3
     ) -> tuple[Model, dict]:
@@ -75,7 +75,6 @@ def train_model(
 
 
 
-
 def evaluate_model(model: Model, X_test: np.ndarray, y_test: np.ndarray) -> tuple[float, float]:
     """
     evaluate trained model on test data
@@ -91,7 +90,6 @@ def evaluate_model(model: Model, X_test: np.ndarray, y_test: np.ndarray) -> tupl
     print(f"Mean Absolute Error (MAE): {mae}")
     print(f"Mean Squared Error (MSE): {mse}")
     return mae, mse
-
 
 
 
