@@ -49,7 +49,7 @@ def main(env='local'):
         local_url_address_base = 'http://127.0.0.1:8000'
 
         # Method 2 - on streamlit
-        online_url_address_base = 'https://basic-api-32vj2qxrpq-ew.a.run.app/predict' #here goes the google run container instance API URL
+        online_url_address_base = 'https://basic-api-32vj2qxrpq-ew.a.run.app' #here goes the google run container instance API URL
 
         # check if we run locally or on the cloud
         if env == 'local':
@@ -68,7 +68,7 @@ def main(env='local'):
         st.write('No input or input incomplete.')
 
 if __name__ == '__main__':
-    main(env='local')
+    main(env='nonlocal')
 else:
     main(env='nonlocal')
 
